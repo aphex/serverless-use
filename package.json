@@ -1,0 +1,25 @@
+{
+  "name": "@serverless-use/repo",
+  "description": "Future Serverless-Use package",
+  "version": "1.0.0-beta.1",
+  "private": "true",
+  "authors": "Ross Gerbasi",
+  "scripts": {
+    "test": "vitest",
+    "build": "npm run build -ws",
+    "stub": "npm run stub -ws --if-present",
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:serve": "vitepress serve"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "unbuild": "^0.7.6",
+    "vitepress": "^1.0.0-alpha.4",
+    "vitest": "^0.19.1",
+    "vue": "^3.2.37"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
