@@ -25,6 +25,8 @@ type ServerlessUseAPIGatewayRequestHandler =
 const SET_COOKIE = 'set-cookie' as const
 const CONTENT_TYPE = 'content-type' as const
 const APPLICATION_JSON = 'application/json' as const
+const TEXT_HTML = 'text/html' as const
+const TEXT_PLAIN = 'text/plain' as const
 
 const createResultFromString = (result: string) => {
   return {
@@ -59,8 +61,9 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
     onError?: (e: Error) => MaybePromise<APIGatewayProxyStructuredResultV2>
     compression?: boolean | UseCompressionsConfig
     fallbackResult?: T extends APIGatewayProxyHandler ? APIGatewayProxyResult : APIGatewayProxyStructuredResultV2
-    useResultDetection?: boolean
+    autoTransformResult?: boolean | 'json' | 'html' | 'text'
     apiType?: 'http' | 'rest'
+    ignoreWarnings?: boolean
   } = {}
 ): ((
   ...params: Parameters<typeof handler>
@@ -72,10 +75,12 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
     compression,
     autoTransformResult,
     apiType,
+    ignoreWarnings,
   } = {
     compression: true,
     autoTransformResult: true,
     apiType: 'rest',
+    ignoreWarnings: false,
     ...config,
   }
 
@@ -99,7 +104,7 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
     // Global Composables for a handler execution
     const { headers: responseHeaders } = useResponseHeaders()
     const { cookies, serialize } = useResponseCookies()
-    const { body } = useResponseBody()
+    const { body, html, text } = useResponseBody()
     const { compress } = useCompression(typeof compression === 'object' ? compression : {})
 
     try {
@@ -128,13 +133,42 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
         } else if (typeof handlerResult === 'object' && !handlerResult.statusCode) {
           handlerResult = createResultFromAny(handlerResult)
         }
+
+        // If the user has specifically set the transform type we will use that header
+        if (typeof autoTransformResult === 'string') {
+          // Lets make sure this exists so we can change headers if we need to
+          handlerResult.headers = handlerResult.headers || {}
+
+          if (autoTransformResult === 'json') {
+            handlerResult.headers[CONTENT_TYPE] = APPLICATION_JSON
+          } else if (autoTransformResult === 'html') {
+            handlerResult.headers[CONTENT_TYPE] = TEXT_HTML
+          } else if (autoTransformResult === 'text') {
+            handlerResult.headers[CONTENT_TYPE] = TEXT_PLAIN
+          }
+        }
+
+        // If the header composable is going to set the content type lets delete the
+        // autotransform content-type and let the users code win this conflict
+        if (hasResponseHeaders && responseHeaders[CONTENT_TYPE] && handlerResult.headers)
+          delete handlerResult.headers[CONTENT_TYPE]
       }
 
       // If we have an object at this point as a result we can now merge in composable
       // headers, cookies and body
       if (typeof handlerResult === 'object') {
+        // Lets make sure this exists so we can change headers if we need to
+        handlerResult.headers = handlerResult.headers || {}
+
+        // Standardize on lowercase headers
+        handlerResult.headers = Object.fromEntries(
+          Object.entries(handlerResult.headers).map(([key, value]) => {
+            return [key.toLowerCase(), value]
+          })
+        )
+
         // Lets apply all the response headers that have accrued through the handlers execution
-        if (hasResponseHeaders) handlerResult.headers = { ...handlerResult.headers, ...responseHeaders }
+        if (hasResponseHeaders) handlerResult.headers = { ...responseHeaders, ...handlerResult.headers }
 
         // Apply any Cookies from the composable. If the handler has already set cookies
         // lets merge in the composable ones.
@@ -150,7 +184,7 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
             if (!handlerResult.headers) handlerResult.headers = {}
             handlerResult.headers[SET_COOKIE] = cookies.join('; ')
 
-            if (apiType !== 'http')
+            if (!ignoreWarnings && cookies.length > 1 && apiType !== 'http')
               console.log(
                 '\x1b[33m',
                 'WARNING: REST API only supports one cookie, only the first cookie will be stored. Attempted to set',
@@ -160,22 +194,35 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
           }
         }
 
+        // If we have no body in the handler response and our useResponseBody
+        // composable has plain text or HTML lets use that
+        if (!handlerResult.body) {
+          if (html.value) {
+            handlerResult.headers[CONTENT_TYPE] = TEXT_HTML
+            handlerResult.body = html.value
+          } else if (text.value) {
+            handlerResult.headers[CONTENT_TYPE] = TEXT_PLAIN
+            handlerResult.body = text.value
+          }
+        }
+
         // If we have a composable body and the result is a JSON object lets merge together
         // the properties. This will allow composables to add properties to the response
         // If it is an empty response but we have composable body properties
         // we will just use them
         if (hasResponseBody) {
-          if (handlerResult?.headers?.[CONTENT_TYPE] === APPLICATION_JSON && typeof handlerResult.body === 'string') {
+          if (handlerResult.headers[CONTENT_TYPE] === APPLICATION_JSON && typeof handlerResult.body === 'string') {
             handlerResult.body = JSON.stringify({ ...body, ...JSON.parse(handlerResult.body) })
           } else if (!handlerResult.body) {
-            if (handlerResult.headers && !handlerResult?.headers?.[CONTENT_TYPE]) {
-              handlerResult.headers[CONTENT_TYPE] === APPLICATION_JSON
-            } else if (!handlerResult.headers) {
-              handlerResult.headers = { [CONTENT_TYPE]: APPLICATION_JSON }
+            if (!handlerResult.headers[CONTENT_TYPE]) {
+              handlerResult.headers[CONTENT_TYPE] = APPLICATION_JSON
             }
             handlerResult.body = JSON.stringify(body)
           }
         }
+
+        // If after all the transforms we still don't have headers, lets just remove them
+        if (!Object.keys(handlerResult.headers).length) delete handlerResult.headers
       }
 
       result =
@@ -195,12 +242,10 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
     }
 
     if (!result) {
-      return (
-        fallbackError || {
-          statusCode: 500,
-          body: 'Internal Server Error',
-        }
-      )
+      result = fallbackError || {
+        statusCode: 500,
+        body: 'Internal Server Error',
+      }
     }
 
     end()

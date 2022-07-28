@@ -6,13 +6,14 @@ let _id: string | undefined
 
 export function useExecution() {
   return {
-    get id() {
+    getId() {
       return _id
     },
-    get isExecuting() {
+    isExecuting() {
       return !!_id
     },
     execute(id?: string) {
+      if (_id) throw new Error('Only one execution can run at a time')
       if (EXECUTION_END_HOOKS.size) throw new Error('Execution scope leak detected')
       _id = id || ulid()
     },
@@ -23,7 +24,6 @@ export function useExecution() {
       EXECUTION_END_HOOKS.clear()
       _id = undefined
     },
-    // message about tweets
     onEnd: (fn: Fn) => {
       EXECUTION_END_HOOKS.add(fn)
     },

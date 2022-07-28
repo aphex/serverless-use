@@ -6,7 +6,7 @@ import type {
   APIGatewayProxyEventV2WithJWTAuthorizer,
   APIGatewayProxyEventV2WithLambdaAuthorizer,
 } from 'aws-lambda'
-type Event =
+export type ServerlessUseAPIGatewayProxyEvent =
   | APIGatewayProxyEvent
   | APIGatewayProxyEventV2
   | APIGatewayProxyEventV2WithJWTAuthorizer
@@ -14,7 +14,7 @@ type Event =
 
 // Event is a Execution Singleton (one time registered global).
 export const useEvent = createSharedExecutionComposable(<
-  T extends Event = APIGatewayProxyEventV2,
+  T extends ServerlessUseAPIGatewayProxyEvent = APIGatewayProxyEventV2
 >() => {
   let event: T | undefined
 

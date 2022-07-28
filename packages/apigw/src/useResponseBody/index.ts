@@ -1,11 +1,23 @@
 import { createSharedExecutionComposable } from '@serverless-use/core'
 
-export const useResponseBody = createSharedExecutionComposable(<
-  T extends object | string = any,
->() => {
-  const body: T extends object ? Partial<T> : T = {} as any
+export const useResponseBody = createSharedExecutionComposable(<T extends Record<string, any>>(initialData?: T) => {
+  const body = initialData || ({} as T)
+  const html = {
+    value: '',
+  }
+  const text = {
+    value: '',
+  }
 
   return {
-    body,
+    get body() {
+      return body
+    },
+    get html() {
+      return html
+    },
+    get text() {
+      return text
+    },
   }
 })

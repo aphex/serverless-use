@@ -1,8 +1,7 @@
 import { createSharedExecutionComposable } from '../createSharedExecutionComposable'
 
 import type { Context } from 'aws-lambda'
-// Context is a Singleton, one time registered global so it does not
-// need to be reactive either. Once set it will never change for the execution scope.
+
 export const useContext = createSharedExecutionComposable(() => {
   let context: Context | undefined
 

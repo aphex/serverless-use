@@ -2,14 +2,14 @@
   "name": "@serverless-use/core",
   "description": "ServerlessUse Core composables",
   "version": "1.0.0-beta.1",
-  "private": "true",
+  "type": "module",
   "authors": "Ross Gerbasi",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     }

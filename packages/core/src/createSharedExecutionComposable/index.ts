@@ -1,8 +1,6 @@
 import { useExecution } from '../useExecution'
 
-export function createSharedExecutionComposable<Fn extends (...args: any[]) => any>(
-  composable: Fn,
-): Fn {
+export function createSharedExecutionComposable<Fn extends (...args: any[]) => any>(composable: Fn): Fn {
   const { onEnd } = useExecution()
   let state: ReturnType<Fn> | undefined
 

@@ -1,11 +1,21 @@
-import { useEvent } from '../useEvent'
+import { ServerlessUseAPIGatewayProxyEvent, useEvent } from '../useEvent'
 
-import type { APIGatewayProxyWithLambdaAuthorizerEvent } from 'aws-lambda'
 export const useLambdaAuthorizerContext = <TAuthorizerContext>() => {
-  const { event } = useEvent<APIGatewayProxyWithLambdaAuthorizerEvent<TAuthorizerContext>>()
-  const authorizer = event.requestContext.authorizer
+  const { event } = useEvent<ServerlessUseAPIGatewayProxyEvent>()
+
+  let _authorizer: TAuthorizerContext | undefined = undefined
+
+  if ('authorizer' in event.requestContext) {
+    const { authorizer } = event.requestContext
+    if (authorizer && 'lambda' in authorizer) {
+      const { lambda } = authorizer
+      if (lambda) _authorizer = lambda as TAuthorizerContext
+    }
+  }
 
   return {
-    get: () => authorizer,
+    get authorizer() {
+      return _authorizer
+    },
   }
 }

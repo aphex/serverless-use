@@ -8,6 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
-    "importsNotUsedAsValues": "error"
+    "importsNotUsedAsValues": "error",
+    "resolveJsonModule": true
   }
 }

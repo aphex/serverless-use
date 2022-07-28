@@ -12,14 +12,7 @@ import type {
 import type { BrotliOptions, ZlibOptions } from 'zlib'
 // All the compression formats we can support
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
-const SUPPORTED_COMPRESSION_FORMATS = [
-  'gzip',
-  'compress',
-  'deflate',
-  'br',
-  'identity',
-  '*',
-] as const
+const SUPPORTED_COMPRESSION_FORMATS = ['gzip', 'compress', 'deflate', 'br', 'identity', '*'] as const
 type SupportedCompressionType = typeof SUPPORTED_COMPRESSION_FORMATS[number]
 
 export type UseCompressionsConfig = {
@@ -60,9 +53,9 @@ export const useCompression = ({ brotli, gzip, deflate, priority }: UseCompressi
       }
     })
     // filter out any compression formats we do not support
-    .filter(({ format }) =>
-      SUPPORTED_COMPRESSION_FORMATS.includes(format as SupportedCompressionType),
-    )
+    .filter(({ format }) => SUPPORTED_COMPRESSION_FORMATS.includes(format as SupportedCompressionType))
+    // filter out any compression formats not in our priority list
+    .filter(({ format }) => _priority.includes(format as SupportedCompressionType))
     // sort by weight and priority index, same q value will fallback to our priority
     // if the format's priority index is less sort it lower (higher priority)
     // if the format's client weight is lower sort it higher (lower priority)
@@ -78,13 +71,8 @@ export const useCompression = ({ brotli, gzip, deflate, priority }: UseCompressi
      * the request header and using that.
      */
     compress(
-      input: Exclude<
-        Awaited<ReturnType<APIGatewayProxyHandler> | ReturnType<APIGatewayProxyHandlerV2>>,
-        void | string
-      >,
-    ): typeof input extends APIGatewayProxyResult
-      ? APIGatewayProxyResult
-      : APIGatewayProxyStructuredResultV2 {
+      input: Exclude<Awaited<ReturnType<APIGatewayProxyHandler> | ReturnType<APIGatewayProxyHandlerV2>>, void | string>
+    ): typeof input extends APIGatewayProxyResult ? APIGatewayProxyResult : APIGatewayProxyStructuredResultV2 {
       // convert simple strings to an object as we will need headers to inform client of encoding
       input = typeof input === 'string' ? { body: input, headers: undefined } : input
 
