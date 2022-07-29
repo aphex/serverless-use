@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  base: '/serverless-use/',
   title: 'ServerlessUse',
   description: 'Documents and Examples for ServerlessUse ',
   themeConfig: {
