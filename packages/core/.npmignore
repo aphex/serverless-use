@@ -1,3 +1,4 @@
 src
+fixtures
 build.config.ts
 **/*.md
