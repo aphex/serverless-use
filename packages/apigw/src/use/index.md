@@ -1,10 +1,9 @@
 # use
-
-Handler wrapper enabling global composable for ApiGateway requests
+Wrapper managing composable execution scope, errors, and automatic result transform for ApiGateway requests
 
 ## Usage
 
-Basic Example
+### Basic Example
 ```ts
 import { use } from '@serverless-use/apigw'
 
@@ -14,22 +13,22 @@ export const handler = use(async () => {
     headers: {
       'Content-Type': 'text/html',
     },
-    body: 'Hello World',
+    body: 'You must live your story.',
   }
 })
 ```
 
-Automatic String Transformation
+### Automatic String Transformation
 ```ts
 import { use } from '@serverless-use/apigw'
 
 // Returns a 200 with application/json and the content as the body
 export const handler = use(async () => {
-  return '{"text": "Hello World"}'
+  return '{"text": "You must live your story."}'
 })
 ```
 
-Automatic Boolean Transformation
+### Automatic Boolean Transformation
 ```ts
 import { use } from '@serverless-use/apigw'
 
@@ -44,24 +43,25 @@ export const handler = use(async () => {
 })
 ```
 
-Automatic Custom Object Transformation
+### Automatic Custom Object Transformation
 ```ts
 import { use } from '@serverless-use/apigw'
 
 // Returns a 200 with application/json and the content as the body
 export const handler = use(async () => {
-  return { text: 'Hello World' }
+  return { text: 'You must live your story.' }
 })
 ```
 
-With Custom Error Handler
+### With Custom Error Handler
 ```ts
-import { use } from '@serverless-use/apigw'
+import { use, useQueryParameters } from '@serverless-use/apigw'
 
-export const handler = use(
+export const handler =  use(
   async () => {
-    if (!isUserAuthorized())
-      throw new Error('Unauthorized User')
+    const { queryParameters } = useQueryParameters()
+    // Do some real auth checking here
+    if (!queryParameters.token) throw new Error('Unauthorized User')
 
     return {
       statusCode: 200,
@@ -77,8 +77,84 @@ export const handler = use(
       headers: {
         'Content-Type': 'text/html',
       },
-      body: e.message,
+      body: /*html*/ `
+        <body style="display: grid; place-content: center;">
+          <img src="https://i.giphy.com/media/wSSooF0fJM97W/giphy.gif">
+        </body>`,
     }),
   },
 )
+```
+
+### Default Fallback Error Result
+```ts
+import { use } from '@serverless-use/apigw'
+
+export const handler = use(
+  async () => {
+    throw new Error()
+  },
+  {
+    fallbackResult: {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Never give up and good luck will find you.' }),
+    },
+  },
+)
+```
+
+### Disable Compression
+```ts
+import { use } from '@serverless-use/apigw'
+
+export const handler = use(
+  async () => {
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'text/html',
+      },
+      body: 'You must live your story.',
+    }
+  },
+  { compression: false },
+)
+```
+
+### Custom Compression
+```ts
+import { use } from '@serverless-use/apigw'
+
+export const handler = use(
+  async () => {
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'text/html',
+      },
+      body: 'You must live your story.',
+    }
+  },
+  {
+    compression: {
+      priority: ['gzip', 'deflate'],
+    },
+  },
+)
+```
+
+### Disable Automatic Result Transformation
+```ts
+import { use } from '@serverless-use/apigw'
+
+export const handler = use(
+  async () => {
+    return 'You must live your story.'
+  },
+  {
+    
+  },
+)
+
 ```

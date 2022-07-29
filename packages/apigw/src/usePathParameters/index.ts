@@ -2,17 +2,15 @@ import { createSharedExecutionComposable } from '@serverless-use/core'
 
 import { useEvent } from '../useEvent'
 
-import type { APIGatewayProxyEventPathParameters } from 'aws-lambda'
-
-export const usePathParameters = createSharedExecutionComposable(<T extends APIGatewayProxyEventPathParameters>() => {
+export const usePathParameters = createSharedExecutionComposable(<T extends string>() => {
   const { event } = useEvent()
-  const get = () => (event?.pathParameters || {}) as T
+  const get = () => (event?.pathParameters || {}) as Record<T, string>
 
   return {
     get pathParameters() {
       return get()
     },
-    get(parameter: keyof T) {
+    get(parameter: T) {
       const pathParameters = get()
       return pathParameters[parameter]
     },

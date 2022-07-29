@@ -6,6 +6,10 @@ export default defineConfig({
   themeConfig: {
     nav: [
       {
+        text: 'Philosophy',
+        link: '/guide/philosophy',
+      },
+      {
         text: 'Getting Started',
         link: '/guide/getting-started',
       },
@@ -13,29 +17,35 @@ export default defineConfig({
         text: 'Composables',
         items: [
           {
-            text: 'Core',
+            text: 'ApiGateway',
             items: [
-              { text: 'createSharedComposable', link: '/packages/core/createSharedComposable/' },
-              { text: 'useExecution', link: '/packages/core/useExecution/' },
-              { text: 'useContext', link: '/packages/core/useContext/' },
+              { text: 'use', link: '/packages/apigw/src/use/' },
+              { text: 'useCompression', link: '/packages/apigw/src/useCompression/' },
+              { text: 'useEvent', link: '/packages/apigw/src/useEvent/' },
+              { text: 'useJWTAuthorizer', link: '/packages/apigw/src/useJWTAuthorizer/' },
+              {
+                text: 'useLambdaAuthorizerContext',
+                link: '/packages/apigw/src/useLambdaAuthorizerContext/',
+              },
+              { text: 'usePathParameters', link: '/packages/apigw/src/usePathParameters/' },
+              { text: 'useQueryParameters', link: '/packages/apigw/src/useQueryParameters/' },
+              { text: 'useRequestBody', link: '/packages/apigw/src/useRequestBody/' },
+              { text: 'useRequestCookies', link: '/packages/apigw/src/useRequestCookies/' },
+              { text: 'useRequestHeaders', link: '/packages/apigw/src/useRequestHeaders/' },
+              { text: 'useResponseBody', link: '/packages/apigw/src/useResponseBody/' },
+              { text: 'useResponseCookies', link: '/packages/apigw/src/useResponseCookies/' },
+              { text: 'useResponseHeaders', link: '/packages/apigw/src/useResponseHeaders/' },
             ],
           },
           {
-            text: 'ApiGateway',
+            text: 'Core',
             items: [
-              { text: 'use', link: '/packages/apigw/use/' },
-              { text: 'useCompression', link: '/packages/apigw/useCompression/' },
-              { text: 'useEvent', link: '/packages/apigw/useEvent/' },
               {
-                text: 'useLambdaAuthorizerContext',
-                link: '/packages/apigw/useLambdaAuthorizerContext/',
+                text: 'createSharedExecutionComposable',
+                link: '/packages/core/src/createSharedExecutionComposable/',
               },
-              { text: 'useQueryParameters', link: '/packages/apigw/useQueryParameters/' },
-              { text: 'useRequestCookies', link: '/packages/apigw/useRequestCookies/' },
-              { text: 'useRequestHeaders', link: '/packages/apigw/useRequestHeaders/' },
-              { text: 'useResponseBody', link: '/packages/apigw/useRequestHeaders/' },
-              { text: 'useResponseCookies', link: '/packages/apigw/useRequestHeaders/' },
-              { text: 'useResponseHeaders', link: '/packages/apigw/useRequestHeaders/' },
+              { text: 'useContext', link: '/packages/core/src/useContext/' },
+              { text: 'useExecution', link: '/packages/core/src/useExecution/' },
             ],
           },
           // { text: 'SNS - Soon ™️', link: '' },
@@ -46,7 +56,6 @@ export default defineConfig({
     ],
     socialLinks: [{ icon: 'github', link: 'https://github.com/aphex/serverless-use' }],
     footer: {
-      message: 'Released under the MIT License.',
       copyright: 'Copyright © 2022-PRESENT Ross Gerbasi',
     },
   },

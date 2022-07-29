@@ -16,6 +16,6 @@ export const useJWTAuthorizer = () => {
 
   return {
     getClaim: (claim: string) => jwt?.claims?.[claim],
-    hasScope: (scope: string) => jwt?.scopes?.includes(scope),
+    hasScope: (scope: string) => !!jwt?.scopes?.includes(scope),
   }
 }

@@ -2,6 +2,8 @@
 Composable to access Request Headers
 
 ## Usage
+
+### Basic Read
 ```ts
 import { use, useRequestHeaders } from '@serverless-use/apigw'
 
@@ -27,5 +29,20 @@ export const handler = use(async () => {
       </div>
     `,
   }
+})
+```
+### Typed Headers
+```ts
+import { use, useRequestHeaders } from '@serverless-use/apigw'
+
+export const handler = use(async () => {
+  const { get } = useRequestHeaders<'authentication' | 'user-agent'>()
+
+  // TS ERROR!
+  // Argument of type '"name"' is not assignable to parameter 
+  // of type '"authentication" | "user-agent"'.
+  const name = get('name')
+
+  return { name }
 })
 ```

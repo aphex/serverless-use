@@ -1,10 +1,13 @@
 # useCompression
-General utility to compress the servers response. This is built into the [use](../use/) handler
+General utility to compress the servers response. 
+
+::: info
+This is built into the [use](../use/) handler
 which will automatically inspect request headers and use compression for the response.
+:::
 
 ## Usage
-
-Custom Compression
+### Custom Compression
 ```ts
 import { use, useCompression } from '@serverless-use/apigw'
 import zlib from 'zlib'
@@ -26,10 +29,9 @@ export const handler = use(
         headers: {
           'Content-Type': 'text/html',
         },
-        body: 'Hello World',
+        body: 'You must live your story.',
       })
     } catch (e) {
-      console.log(e)
       return {
         statusCode: 400,
       }

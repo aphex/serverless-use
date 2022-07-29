@@ -1,8 +1,6 @@
 ---
 layout: home
 
-# Serverless
-
 hero:
   name: ServerlessUse
   text: Collection of Serverless Composable Utilities
@@ -13,18 +11,27 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/
+      link: /guide/getting-started
     - theme: alt
       text: View on GitHub
       link: https://github.com/aphex/serverless-use
 features:
-  - icon: 💾
-    title: Execution and Invocation Caching
-    details: Speed up your functions with built in caching for the execution or invocation lifetime
-  - icon: 🌎
-    title: Global State for the Backend
-    details: Automatic global registration allows you to access you request from anywhere
-  - icon: 🛠️
-    title: Easy to Extend and Compose
-    details: Create your own composables to quickly access what you need
+  - icon: 🎻
+    title: Composable functions for common tasks
+    details: Simplify code by reusing common functions
+  - icon: ⚠️
+    title: Global error handling
+    details: Provide a single error handler to catch any errors
+  - icon: 💻
+    title: Strict Execution Scope
+    details: Composables all are created once per execution and disposed 🗑️.
+  - icon: 🗜️
+    title: Automatic Response Compression
+    details: Compress all responses Out of the Box
+  - icon: 🤖
+    title: Automatic Result Transform
+    details: Automatically convert common handler returns types for simpler code
+  - icon: ⌨
+    title: Built with TypeScript
+    details: Composables all provide opt in strong typing 💪
 ---

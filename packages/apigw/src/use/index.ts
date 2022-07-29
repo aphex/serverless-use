@@ -51,23 +51,31 @@ const createResultFromAny = (result: any) => {
   }
 }
 
-export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGatewayProxyHandlerV2<Record<string, any>>>(
+export const use = <
+  T extends ServerlessUseAPIGatewayRequestHandler = APIGatewayProxyHandlerV2<Record<string, any>>,
+>(
   handler: (
     event: Parameters<T>[0],
     context: Parameters<T>[1],
-    callback: Parameters<T>[2]
-  ) => MaybePromise<Awaited<ReturnType<T>> | (boolean | APIGatewayProxyResult | APIGatewayProxyStructuredResultV2)>,
+    callback: Parameters<T>[2],
+  ) => MaybePromise<
+    Awaited<ReturnType<T>> | (boolean | APIGatewayProxyResult | APIGatewayProxyStructuredResultV2)
+  >,
   config: {
     onError?: (e: Error) => MaybePromise<APIGatewayProxyStructuredResultV2>
     compression?: boolean | UseCompressionsConfig
-    fallbackResult?: T extends APIGatewayProxyHandler ? APIGatewayProxyResult : APIGatewayProxyStructuredResultV2
+    fallbackResult?: T extends APIGatewayProxyHandler
+      ? APIGatewayProxyResult
+      : APIGatewayProxyStructuredResultV2
     autoTransformResult?: boolean | 'json' | 'html' | 'text'
     apiType?: 'http' | 'rest'
     ignoreWarnings?: boolean
-  } = {}
+  } = {},
 ): ((
   ...params: Parameters<typeof handler>
-) => Promise<APIGatewayProxyResult | APIGatewayProxyStructuredResultV2 | ReturnType<typeof handler>>) => {
+) => Promise<
+  APIGatewayProxyResult | APIGatewayProxyStructuredResultV2 | ReturnType<typeof handler>
+>) => {
   // Lets setup some default config values
   const {
     onError,
@@ -91,7 +99,11 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
   // - running user handler
   // - automatic result compression
   // - error handling
-  return async (event: Parameters<typeof handler>[0], context: Context, callback: Parameters<typeof handler>[2]) => {
+  return async (
+    event: Parameters<typeof handler>[0],
+    context: Context,
+    callback: Parameters<typeof handler>[2],
+  ) => {
     execute(context.awsRequestId)
     let result: ReturnType<typeof use>
     // First thing we do is add the event and context globally to the
@@ -164,11 +176,12 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
         handlerResult.headers = Object.fromEntries(
           Object.entries(handlerResult.headers).map(([key, value]) => {
             return [key.toLowerCase(), value]
-          })
+          }),
         )
 
         // Lets apply all the response headers that have accrued through the handlers execution
-        if (hasResponseHeaders) handlerResult.headers = { ...responseHeaders, ...handlerResult.headers }
+        if (hasResponseHeaders)
+          handlerResult.headers = { ...responseHeaders, ...handlerResult.headers }
 
         // Apply any Cookies from the composable. If the handler has already set cookies
         // lets merge in the composable ones.
@@ -189,8 +202,26 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
                 '\x1b[33m',
                 'WARNING: REST API only supports one cookie, only the first cookie will be stored. Attempted to set',
                 cookies,
-                '\x1b[0m'
+                '\x1b[0m',
               )
+          }
+        }
+
+        // If we have a composable body and the result is a JSON object lets merge together
+        // the properties. This will allow composables to add properties to the response
+        // If it is an empty response but we have composable body properties
+        // we will just use them
+        if (hasResponseBody) {
+          if (
+            handlerResult.headers[CONTENT_TYPE] === APPLICATION_JSON &&
+            typeof handlerResult.body === 'string'
+          ) {
+            handlerResult.body = JSON.stringify({ ...body, ...JSON.parse(handlerResult.body) })
+          } else if (!handlerResult.body) {
+            if (!handlerResult.headers[CONTENT_TYPE]) {
+              handlerResult.headers[CONTENT_TYPE] = APPLICATION_JSON
+            }
+            handlerResult.body = JSON.stringify(body)
           }
         }
 
@@ -203,21 +234,6 @@ export const use = <T extends ServerlessUseAPIGatewayRequestHandler = APIGateway
           } else if (text.value) {
             handlerResult.headers[CONTENT_TYPE] = TEXT_PLAIN
             handlerResult.body = text.value
-          }
-        }
-
-        // If we have a composable body and the result is a JSON object lets merge together
-        // the properties. This will allow composables to add properties to the response
-        // If it is an empty response but we have composable body properties
-        // we will just use them
-        if (hasResponseBody) {
-          if (handlerResult.headers[CONTENT_TYPE] === APPLICATION_JSON && typeof handlerResult.body === 'string') {
-            handlerResult.body = JSON.stringify({ ...body, ...JSON.parse(handlerResult.body) })
-          } else if (!handlerResult.body) {
-            if (!handlerResult.headers[CONTENT_TYPE]) {
-              handlerResult.headers[CONTENT_TYPE] = APPLICATION_JSON
-            }
-            handlerResult.body = JSON.stringify(body)
           }
         }
 

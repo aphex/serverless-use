@@ -12,15 +12,20 @@ export const useRequestBody = createSharedExecutionComposable(
     const { event } = useEvent()
     const { get } = useRequestHeaders()
     const contentType = get('content-type')
+    const isBase64Encoded = event.isBase64Encoded
 
-    const { body } = event
+    const body =
+      event.body && isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body
 
-    const _body: T = typeof body === 'string' && contentType === 'application/json' ? JSON.parse(body, reviver) : body
+    const _body: T =
+      typeof body === 'string' && contentType === 'application/json'
+        ? JSON.parse(body, reviver)
+        : body
 
     return {
       get body() {
         return _body
       },
     }
-  }
+  },
 )
