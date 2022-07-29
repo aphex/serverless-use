@@ -68,7 +68,7 @@ a dedicated server that is on all the time awaiting requests to come into it. Un
 which is the process by which the Lambda **spins up** the execution phase focuses on the lifetime of
 the function itself
 
-The [ServerlessUse `use` helper](/packages/apigw/use) helps manage the execution of your lambda by
+The [ServerlessUse `use` helper](/packages/apigw/src/use/) helps manage the execution of your lambda by
 automatically tracking its start and end. This means that composables can be sure that memory will 
 not leak out into other request executions. 
 
