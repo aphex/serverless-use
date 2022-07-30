@@ -1,15 +1,17 @@
 import { createSharedExecutionComposable } from '@serverless-use/core'
 
-export const useResponseHeaders = createSharedExecutionComposable(<T extends string>() => {
-  const headers: Record<T, string> = {} as Record<T, string>
+export const useResponseHeaders = createSharedExecutionComposable(<
+  T extends Record<string, string>,
+>() => {
+  const headers = {} as T
 
   return {
     headers,
-    get(header: T) {
-      return headers[header.toLowerCase() as T]
+    get(header: keyof T) {
+      return headers[header.toString().toLowerCase()]
     },
-    set(header: T, value: string) {
-      headers[header.toLowerCase() as T] = value
+    set(header: keyof T, value: string) {
+      headers[header.toString().toLowerCase() as keyof T] = value as typeof headers[keyof T]
     },
   }
 })

@@ -55,6 +55,22 @@ export default defineConfig({
       },
     ],
     socialLinks: [{ icon: 'github', link: 'https://github.com/aphex/serverless-use' }],
+    algolia: {
+      appId: '3AH448F13U',
+      apiKey: 'f3d74b996581ace7ea2c029a64d68938',
+      indexName: 'serverless-use',
+    },
+    sidebar: {
+      '/packages/apigw/examples': [
+        {
+          text: 'Examples',
+          items: [
+            { text: 'Rick & Morty', link: '/packages/apigw/examples/rick-and-morty' },
+            { text: 'JWT Authentication', link: '/packages/apigw/examples/jwt-auth' },
+          ],
+        },
+      ],
+    },
     footer: {
       copyright: 'Copyright © 2022-PRESENT Ross Gerbasi',
     },

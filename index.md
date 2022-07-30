@@ -12,6 +12,9 @@ hero:
     - theme: brand
       text: Get Started
       link: /guide/getting-started
+    - theme: brand
+      text: Api Gateway Examples
+      link: /packages/apigw/examples/rick-and-morty
     - theme: alt
       text: View on GitHub
       link: https://github.com/aphex/serverless-use

@@ -35,7 +35,7 @@ export const handler = use(async () => {
 import { use, useRequestCookies } from '@serverless-use/apigw'
 
 export const handler = use(async () => {
-  const { get } = useRequestCookies<'name'>()
+  const { get } = useRequestCookies<{ name?: string }>()
 
   // TS ERROR!
   // Argument of type '"foo"' is not assignable to parameter of type '"name"'.

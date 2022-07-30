@@ -38,7 +38,7 @@ export const handler = use(async () => {
 import { use, useResponseHeaders } from '@serverless-use/apigw'
 
 export const handler = use(async () => {
-  const { set, get } = useResponseHeaders<'content-type' | 'authorization'>()
+  const { set, get } = useResponseHeaders<{ 'content-type': string, 'authorization': string }>()
   set('content-type', 'application/json')
 
   // TS Error! 

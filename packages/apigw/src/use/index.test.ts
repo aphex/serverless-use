@@ -27,12 +27,22 @@ const fn = () => {}
 
 describe('Compression', () => {
   it('should use compress by default', async () => {
-    const handler = use(async () => {
-      return {
-        statusCode: 200,
-        body: 'Hello World',
-      }
-    })
+    const handler = use(
+      async () => {
+        return {
+          statusCode: 200,
+          body: 'Hello World',
+        }
+      },
+      {
+        onError(e) {
+          console.log(e)
+          return {
+            statusCode: 500,
+          }
+        },
+      },
+    )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
       statusCode: 200,
@@ -51,7 +61,7 @@ describe('AutoTransform', () => {
           body: 'Hello World',
         }
       },
-      { compression: false }
+      { compression: false },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -67,7 +77,7 @@ describe('AutoTransform', () => {
         return 'Hello World'
       },
 
-      { compression: false }
+      { compression: false },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -83,7 +93,7 @@ describe('AutoTransform', () => {
         return true
       },
 
-      { compression: false }
+      { compression: false },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -97,7 +107,7 @@ describe('AutoTransform', () => {
         return 'Hello World'
       },
 
-      { compression: false, autoTransformResult: 'html' }
+      { compression: false, autoTransformResult: 'html' },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -113,7 +123,7 @@ describe('AutoTransform', () => {
         return 'Hello World'
       },
 
-      { compression: false, autoTransformResult: 'text' }
+      { compression: false, autoTransformResult: 'text' },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -129,7 +139,7 @@ describe('AutoTransform', () => {
         return 'Hello World'
       },
 
-      { compression: false, autoTransformResult: 'json' }
+      { compression: false, autoTransformResult: 'json' },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -147,7 +157,7 @@ describe('AutoTransform', () => {
         }
       },
 
-      { compression: false, autoTransformResult: false }
+      { compression: false, autoTransformResult: false },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({ text: 'Hello World' })
@@ -172,7 +182,7 @@ describe('Request Composables', () => {
       },
       {
         compression: false,
-      }
+      },
     )
 
     const result = await handler(SampleEvent, Context, fn)
@@ -200,7 +210,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -227,7 +237,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -254,7 +264,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -278,7 +288,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -298,7 +308,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -320,7 +330,7 @@ describe('Response Composables', () => {
         {
           compression: false,
           apiType: 'http',
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -343,7 +353,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -367,7 +377,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -391,7 +401,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -410,7 +420,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -429,7 +439,7 @@ describe('Response Composables', () => {
         },
         {
           compression: false,
-        }
+        },
       )
 
       const result = await handler(SampleEvent, Context, fn)
@@ -457,7 +467,7 @@ describe('Error Handling', () => {
           return error
         },
         compression: false,
-      }
+      },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject(error)
@@ -476,7 +486,7 @@ describe('Error Handling', () => {
         onError() {
           return error
         },
-      }
+      },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject({
@@ -510,7 +520,7 @@ describe('Error Handling', () => {
       {
         fallbackResult,
         compression: false,
-      }
+      },
     )
     const result = await handler(SampleEvent, Context, fn)
     expect(result).toMatchObject(fallbackResult)

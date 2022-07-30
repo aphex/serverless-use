@@ -35,7 +35,7 @@ export const handler = use(async () => {
 import { use, useQueryParameters } from '@serverless-use/apigw'
 
 export const handler = use(async () => {
-  const { get } = useQueryParameters<'name'>()
+  const { get } = useQueryParameters<{ name?: string }>()
 
   // TS ERROR!
   // Argument of type '"foo"' is not assignable to parameter of type '"name"'.

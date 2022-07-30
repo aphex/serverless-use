@@ -36,7 +36,7 @@ export const handler = use(async () => {
 import { use, useRequestHeaders } from '@serverless-use/apigw'
 
 export const handler = use(async () => {
-  const { get } = useRequestHeaders<'authentication' | 'user-agent'>()
+  const { get } = useRequestHeaders<{ authentication?: string,  'user-agent': 'string' }>()
 
   // TS ERROR!
   // Argument of type '"name"' is not assignable to parameter 
