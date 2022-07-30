@@ -1,10 +1,10 @@
 import { useExecution } from '../useExecution'
 
-export function createSharedExecutionComposable<Fn extends (...args: any[]) => any>(
+export function createSharedExecutionComposable<Fn extends (...args: any[]) => MaybePromise<any>>(
   composable: Fn,
 ): Fn {
   const { onEnd } = useExecution()
-  let state: ReturnType<Fn> | undefined
+  let state: ReturnType<Awaited<Fn>> | undefined
 
   const dispose = () => {
     if (state) state = undefined
@@ -12,8 +12,17 @@ export function createSharedExecutionComposable<Fn extends (...args: any[]) => a
 
   return <Fn>((...args) => {
     if (!state) {
-      state = composable(...args)
+      const result = composable(...args) || true
       onEnd(dispose)
+
+      if (result instanceof Promise) {
+        return result.then((value: typeof state) => {
+          state = value
+          return state
+        })
+      } else {
+        state = result
+      }
     }
 
     return state

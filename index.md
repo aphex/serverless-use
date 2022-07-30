@@ -13,7 +13,10 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: brand
-      text: Api Gateway Examples
+      text: Composables
+      link: /packages/apigw/src/use/
+    - theme: brand
+      text: Examples
       link: /packages/apigw/examples/rick-and-morty
     - theme: alt
       text: View on GitHub

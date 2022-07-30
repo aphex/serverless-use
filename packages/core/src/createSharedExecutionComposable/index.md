@@ -5,7 +5,7 @@ Utility function to wrap any composables making sure they are only run once per 
 
 ## Usage
 
-In this example we share data globally across throughout execution
+### Shared Execution State
 ```ts
 import { createSharedExecutionComposable } from '@serverless-use/core'
 
@@ -24,4 +24,25 @@ export const useState = createSharedExecutionComposable(() => {
   return { state }
 })
 
+```
+
+### Async Composable
+::: warning
+Generally it is best practice to keep composables synchronous and perform async calls as needed. For example this composable could return a function `getData` that is `async` and caches its response.
+:::
+```ts
+import { createSharedExecutionComposable } from '@serverless-use/core'
+
+const useRemoteData = createSharedExecutionComposable(async () => {
+  return new Promise<{ data: string[] }>((resolve) => {
+    setTimeout(() => {
+      // fetch some async data here
+      const data = ['Falkor', 'Atreyu', 'Rockbiter']
+      resolve({ data })
+    }, 10)
+  })
+})
+
+// [ 'Falkor', 'Atreyu', 'Rockbiter' ]
+const { data } = await useRemoteData()
 ```

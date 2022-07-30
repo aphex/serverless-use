@@ -1,35 +1,141 @@
-import { expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { createSharedExecutionComposable } from '.'
 import { useExecution } from '../useExecution'
 
 const { execute, end } = useExecution()
 
-it('Should only execute once per execution', () => {
-  execute()
-  let count = 0
+describe('sync', () => {
+  it('Should only execute once per execution', () => {
+    const handler = vi.fn(() => true)
+    execute()
 
-  const composable = createSharedExecutionComposable(() => ++count)
-  composable()
-  composable()
-  composable()
-  end()
+    const composable = createSharedExecutionComposable(handler)
+    composable()
+    composable()
+    composable()
+    end()
 
-  expect(count).toBe(1)
+    expect(handler).toHaveBeenCalledOnce()
+  })
+
+  it('Should execute every execution', () => {
+    const handler = vi.fn(() => true)
+    const composable = createSharedExecutionComposable(handler)
+
+    execute()
+    composable()
+    end()
+
+    execute()
+    composable()
+    end()
+
+    expect(handler).toHaveBeenCalledTimes(2)
+  })
+
+  it('Should return the same data when called multiple times', () => {
+    const handler = vi.fn(() => ({ time: Date.now() }))
+    const composable = createSharedExecutionComposable(handler)
+
+    execute()
+    const resultA = composable()
+    const resultB = composable()
+    end()
+
+    expect(resultA).toHaveProperty('time')
+    expect(resultA).toBe(resultB)
+  })
+
+  it('Should return different data when called in separate executions', () => {
+    let id = 0
+    const handler = vi.fn(() => ++id)
+    const composable = createSharedExecutionComposable(handler)
+
+    execute()
+    const resultA = composable()
+    end()
+    execute()
+    const resultB = composable()
+    end()
+
+    expect(resultA).toBeTruthy()
+    expect(resultB).toBeTruthy()
+    expect(resultA).not.toBe(resultB)
+  })
 })
 
-it('Should execute every execution', () => {
-  let count = 0
+describe('async', () => {
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-  const composable = createSharedExecutionComposable(() => ++count)
+  it('Should only execute once per execution', async () => {
+    execute()
+    const handler = vi.fn(async () => {
+      await sleep(1)
+      return true
+    })
 
-  execute()
-  composable()
-  end()
+    const composable = createSharedExecutionComposable(handler)
+    await composable()
+    await composable()
+    await composable()
+    end()
 
-  execute()
-  composable()
-  end()
+    expect(handler).toHaveBeenCalledOnce()
+  })
 
-  expect(count).toBe(2)
+  it('Should execute every execution', async () => {
+    const handler = vi.fn(async () => {
+      await sleep(1)
+      return true
+    })
+
+    const composable = createSharedExecutionComposable(handler)
+
+    execute()
+    await composable()
+    end()
+
+    execute()
+    await composable()
+    end()
+
+    expect(handler).toHaveBeenCalledTimes(2)
+  })
+
+  it('Should return the same data when called multiple times', async () => {
+    const handler = vi.fn(async () => {
+      await sleep(1)
+      return { time: Date.now() }
+    })
+    const composable = createSharedExecutionComposable(handler)
+
+    execute()
+    const resultA = await composable()
+    const resultB = await composable()
+    end()
+
+    expect(resultA).toHaveProperty('time')
+    expect(resultA).toBe(resultB)
+  })
+
+  it('Should return different data when called in separate executions', async () => {
+    const handler = vi.fn(async () => {
+      await sleep(1)
+      return { time: Date.now() }
+    })
+    const composable = createSharedExecutionComposable(handler)
+
+    execute()
+    const resultA = await composable()
+    end()
+
+    execute()
+    const resultB = await composable()
+    end()
+
+    expect(resultA).toHaveProperty('time')
+    expect(resultB).toHaveProperty('time')
+    expect(resultA.time).toBeLessThan(resultB.time)
+  })
 })
