@@ -114,7 +114,7 @@ import{_ as s,c as a,o as n,a as l}from"./app.91ab6c81.js";const A=JSON.parse('{
 <span class="line"><span style="color:#F07178;">    </span><span style="color:#89DDFF;font-style:italic;">return</span><span style="color:#F07178;"> </span><span style="color:#89DDFF;">&#39;</span><span style="color:#C3E88D;">You must live your story.</span><span style="color:#89DDFF;">&#39;</span></span>
 <span class="line"><span style="color:#F07178;">  </span><span style="color:#89DDFF;">},</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#89DDFF;">{</span></span>
-<span class="line"><span style="color:#A6ACCD;">    </span></span>
+<span class="line"><span style="color:#A6ACCD;">    </span><span style="color:#F07178;">autoTransformResult</span><span style="color:#89DDFF;">:</span><span style="color:#A6ACCD;"> </span><span style="color:#FF9CAC;">false</span></span>
 <span class="line"><span style="color:#A6ACCD;">  </span><span style="color:#89DDFF;">},</span></span>
 <span class="line"><span style="color:#A6ACCD;">)</span></span>
 <span class="line"></span>
