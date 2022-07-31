@@ -153,7 +153,7 @@ export const handler = use(
     return 'You must live your story.'
   },
   {
-    
+    autoTransformResult: false
   },
 )
 
