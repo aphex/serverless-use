@@ -51,6 +51,28 @@ const createResultFromAny = (result: any) => {
   }
 }
 
+// This function is to hack in multiple cookies support in AWS REST API
+// since `headers` is an object for the response and we have no `multiValueHeaders`
+// in the rest api we can have only 1 `set-cookie` header. So this function will create
+// casing variations like `set-cookiE`, `set-cookIe` etc so we can get the max
+// number of cookies out of a single response
+const caseSetCookieHeader = (index: number) => {
+  const base = 'setcookie'
+  const max = parseInt(new Array(base.length).fill(1).join(''), 2)
+  if (index > max) throw new Error('To many cookies, max is ' + max)
+
+  const binary = index.toString(2).padStart(9, '0')
+  const cased = binary
+    .split('')
+    .map((bit, i) => {
+      const character = base.charAt(i)
+      return bit === '1' ? character.toUpperCase() : character.toLowerCase()
+    })
+    .join('')
+
+  return `${cased.slice(0, 3)}-${cased.slice(3)}`
+}
+
 export const use = <
   T extends ServerlessUseAPIGatewayRequestHandler = APIGatewayProxyHandlerV2<Record<string, any>>,
 >(
@@ -195,15 +217,10 @@ export const use = <
             _handlerResult.multiValueHeaders[SET_COOKIE] = cookies
           } else if (cookies.length) {
             if (!handlerResult.headers) handlerResult.headers = {}
-            handlerResult.headers[SET_COOKIE] = cookies.join('; ')
-
-            if (!ignoreWarnings && cookies.length > 1 && apiType !== 'http')
-              console.log(
-                '\x1b[33m',
-                'WARNING: REST API only supports one cookie, only the first cookie will be stored. Attempted to set',
-                cookies,
-                '\x1b[0m',
-              )
+            const cookieHeaders = Object.fromEntries(
+              cookies.map((cookie, i) => [caseSetCookieHeader(i), cookie]),
+            )
+            handlerResult.headers = { ...cookieHeaders, ...handlerResult.headers }
           }
         }
 

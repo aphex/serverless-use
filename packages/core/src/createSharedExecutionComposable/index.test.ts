@@ -122,7 +122,7 @@ describe('async', () => {
   it('Should return different data when called in separate executions', async () => {
     const handler = vi.fn(async () => {
       await sleep(1)
-      return { time: Date.now() }
+      return { id: Math.random() * 10000 }
     })
     const composable = createSharedExecutionComposable(handler)
 
@@ -134,8 +134,8 @@ describe('async', () => {
     const resultB = await composable()
     end()
 
-    expect(resultA).toHaveProperty('time')
-    expect(resultB).toHaveProperty('time')
-    expect(resultA.time).toBeLessThan(resultB.time)
+    expect(resultA).toHaveProperty('id')
+    expect(resultB).toHaveProperty('id')
+    expect(resultA.id).not.toBe(resultB.id)
   })
 })

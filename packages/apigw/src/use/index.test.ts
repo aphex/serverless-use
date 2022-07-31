@@ -320,7 +320,38 @@ describe('Response Composables', () => {
       })
     })
 
-    it('should use `multiValueHeaders` for http and multiple composed cookies', async () => {
+    it('should use re-case `set-cookie` for multiple REST api cookies', async () => {
+      const handler = use(
+        async () => {
+          const { set } = useResponseCookies()
+          for (let i = 0; i < 10; i++) {
+            set(`foo-${i}`, `bar-${i}`)
+          }
+        },
+        {
+          compression: false,
+        },
+      )
+
+      const result = await handler(SampleEvent, Context, fn)
+      expect(result).toMatchObject({
+        statusCode: 200,
+        headers: {
+          'set-coOkiE': 'foo-9=bar-9',
+          'set-coOkie': 'foo-8=bar-8',
+          'set-cooKIE': 'foo-7=bar-7',
+          'set-cooKIe': 'foo-6=bar-6',
+          'set-cooKiE': 'foo-5=bar-5',
+          'set-cooKie': 'foo-4=bar-4',
+          'set-cookIE': 'foo-3=bar-3',
+          'set-cookIe': 'foo-2=bar-2',
+          'set-cookiE': 'foo-1=bar-1',
+          'set-cookie': 'foo-0=bar-0',
+        },
+      })
+    })
+
+    it('should use `multiValueHeaders` for HTTP api and multiple cookies', async () => {
       const handler = use(
         async () => {
           const { set } = useResponseCookies()
