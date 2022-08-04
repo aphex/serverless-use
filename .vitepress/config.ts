@@ -59,11 +59,11 @@ export default defineConfig({
       },
     ],
     socialLinks: [{ icon: 'github', link: 'https://github.com/aphex/serverless-use' }],
-    // algolia: {
-    //   appId: '3AH448F13U',
-    //   apiKey: 'f3d74b996581ace7ea2c029a64d68938',
-    //   indexName: 'serverless-use',
-    // },
+    algolia: {
+      appId: 'TZW9AHYYOF',
+      apiKey: '0c2c784c9712625303239628ab2d04f6',
+      indexName: 'serverlessuse',
+    },
     sidebar: {
       '/packages/apigw/examples': [
         {
