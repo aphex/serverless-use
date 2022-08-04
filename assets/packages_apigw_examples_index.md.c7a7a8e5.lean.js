@@ -1,1 +1,0 @@
-import{_ as e,c as a,o as t}from"./app.91ab6c81.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"packages/apigw/examples/index.md"}'),r={name:"packages/apigw/examples/index.md"};function s(n,p,c,o,i,d){return t(),a("div")}var l=e(r,[["render",s]]);export{m as __pageData,l as default};
